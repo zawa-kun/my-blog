@@ -1,6 +1,6 @@
-import Header from "@/components/layouts/header/header";
+import Header from "@/components/layout/header/header";
 import "./globals.css";
-import ThreeBackground from "@/components/layouts/background/ThreeBackground";
+import ThreeBackground from "@/components/layout/background/ThreeBackground";
 
 export default function RootLayout({
   children,
