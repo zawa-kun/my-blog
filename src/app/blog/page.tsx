@@ -1,5 +1,7 @@
 export default function Blog(){
     return (
-        <h1>Blog Page</h1>
+        <div className="py-19 px-6 text-xl font-bold">
+            Coming soon!
+        </div>
     )
 };

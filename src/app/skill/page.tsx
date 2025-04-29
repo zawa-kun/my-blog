@@ -1,5 +1,7 @@
 export default function Skill() {
     return (
-        <h1>Skill Page</h1>
+        <div className="py-19 px-6 text-xl font-bold">
+            Coming soon!
+        </div>
     )
 }

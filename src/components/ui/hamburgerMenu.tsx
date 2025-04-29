@@ -47,16 +47,22 @@ export default function HamburgerMenu() {
   // メニューのアニメーション設定
   const menuVariants = {
     closed: {
-      opacity: 0,
-      y: -20,
+      x: "-100%",
       transition: {
         staggerChildren: 0.05,
         staggerDirection: -1,
+        ease: "easeInOut",
+        duration: 0.3,
       },
     },
     open: {
-      opacity: 1,
-      y: 20
+      x: 0,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+        ease: "easeOut",
+        duration: 0.3,
+      },
     },
   };
 
@@ -66,12 +72,18 @@ export default function HamburgerMenu() {
     open: { opacity: 1, x: 0 },
   };
 
+  // オーバーレイのアニメーション設定
+  const overlayVariants = {
+    closed: { opacity: 0 },
+    open: { opacity: 0.5 },
+  };
+
   return (
     <>
       <motion.button
         ref={buttonRef}
         onClick={toggleMenu}
-        className="font-bold text-2xl p-2 z-20 relative"
+        className="font-bold text-2xl p-2 z-50 relative"
         aria-label={isOpen ? "メニューを閉じる" : "メニューを開く"}
         whileTap={{ scale: 0.9 }}
       >
@@ -80,31 +92,44 @@ export default function HamburgerMenu() {
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            ref={menuRef}
-            className="absolute top-10 p-5 rounded-lg z-10"
-            variants={menuVariants}
-            initial="closed"
-            animate="open"
-            exit="closed"
-          >
-            {links.map((link) => (
-              <motion.div key={link.name} variants={linkVariants}>
-                <Link
-                  href={link.href}
-                  className={clsx(
-                    "flex h-[48px] items-center justify-center gap-2 p-3 text-xl font-bold hover:text-gray-600",
-                    {
-                      "text-gray-600": pathname === link.href,
-                    }
-                  )}
-                  onClick={() => setIsOpen(false)}
-                >
-                  <span>{link.name}</span>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
+          <>
+            <motion.div
+              className="fixed inset-0 bg-black z-30"
+              variants={overlayVariants}
+              initial="closed"
+              animate="open"
+              exit="closed"
+              onClick={() => setIsOpen(false)}
+            />
+
+            <motion.div
+              ref={menuRef}
+              className="fixed top-0 left-0 h-full w-2/5 p-5 pt-20 bg-black z-40 overflow-y-auto"
+              variants={menuVariants}
+              initial="closed"
+              animate="open"
+              exit="closed"
+            >
+              <div className="flex flex-col space-y-2">
+                {links.map((link) => (
+                  <motion.div key={link.name} variants={linkVariants}>
+                    <Link
+                      href={link.href}
+                      className={clsx(
+                        "flex h-[48px] items-center gap-2 p-3 text-xl font-bold hover:text-gray-600",
+                        {
+                          "text-gray-600": pathname === link.href,
+                        }
+                      )}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>{link.name}</span>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
