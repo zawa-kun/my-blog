@@ -1,4 +1,3 @@
-import Header from "@/components/header";
 import { GitHubLogoIcon, LinkedInLogoIcon } from "@radix-ui/react-icons";
 
 export default function Home() {

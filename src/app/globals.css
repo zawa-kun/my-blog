@@ -1,15 +1,8 @@
 @import "tailwindcss";
 
-
 :root {
   --background: #ffffff;
-  --foreground: #fafafa;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box
+  --foreground: #ffffff;
 }
 
 body {
