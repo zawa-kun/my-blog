@@ -1,12 +1,18 @@
-'use client'
+"use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 export default function ThreeBackground() {
   const mountRef = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    if (!mountRef.current) return;
+
+    // レンダラーの作成
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
     // シーンの作成
     const scene = new THREE.Scene();
 
@@ -19,22 +25,59 @@ export default function ThreeBackground() {
     );
     camera.position.z = 2;
 
-    // レンダラーの作成
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio); // 高解像度対応
-    mountRef.current?.appendChild(renderer.domElement);
+    // 初期サイズ設定
+    const updateSize = () => {
+      if (mountRef.current) {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(window.devicePixelRatio || 1);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+      }
+    };
+
+    updateSize();
+    mountRef.current.appendChild(renderer.domElement);
+    setIsLoaded(true);
 
     // 波の作成
     const geometry = new THREE.PlaneGeometry(10, 10, 100, 100);
-    const textureLoader = new THREE.TextureLoader();
-    const waterTexture = textureLoader.load("/images/water-texture3.jpg");
-    const material = new THREE.MeshPhongMaterial({
-      map: waterTexture,
-      shininess: 100,
-      opacity: 0.9,
-      transparent: true,
-    });
+
+    // テクスチャロードの安全性確保
+    let material;
+    try {
+      const textureLoader = new THREE.TextureLoader();
+      const waterTexture = textureLoader.load(
+        "/images/water-texture3.jpg",
+        // 成功時のコールバック
+        () => {
+          renderer.render(scene, camera);
+        },
+        // 進捗コールバック
+        undefined,
+        // エラー時のコールバック
+        (err) => {
+          console.error("テクスチャの読み込みエラー:", err);
+        }
+      );
+
+      material = new THREE.MeshPhongMaterial({
+        map: waterTexture,
+        shininess: 100,
+        opacity: 0.9,
+        transparent: true,
+      });
+    } catch (error) {
+      console.error("テクスチャ処理エラー:", error);
+      // フォールバックマテリアル
+      material = new THREE.MeshPhongMaterial({
+        color: 0x0077be,
+        shininess: 100,
+        opacity: 0.9,
+        transparent: true,
+      });
+    }
 
     const plane = new THREE.Mesh(geometry, material);
     scene.add(plane);
@@ -52,26 +95,28 @@ export default function ThreeBackground() {
 
     // 画面リサイズ処理
     const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(window.devicePixelRatio); // 高画質ディスプレイにも対応
+      updateSize();
     };
     window.addEventListener("resize", handleResize);
 
+    // アニメーション
+    let animationFrameId: number;
+
     const animate = () => {
-      requestAnimationFrame(animate);
+      animationFrameId = requestAnimationFrame(animate);
 
-      const positionArray = geometry.attributes.position.array;
-      const time = Date.now() * 0.0007;
+      if (geometry.attributes.position && geometry.attributes.position.array) {
+        const positionArray = geometry.attributes.position.array;
+        const time = Date.now() * 0.001;
 
-      for (let i = 0; i < positionArray.length; i += 3) {
-        positionArray[i + 2] =
-          Math.sin(time + positionArray[i]) * 0.5 +
-          Math.cos(time + positionArray[i + 1]) * 0.3;
+        for (let i = 0; i < positionArray.length; i += 3) {
+          positionArray[i + 2] =
+            Math.sin(time + positionArray[i]) * 0.5 +
+            Math.cos(time + positionArray[i + 1]) * 0.3;
+        }
+
+        geometry.attributes.position.needsUpdate = true;
       }
-
-      geometry.attributes.position.needsUpdate = true;
 
       renderer.render(scene, camera);
     };
@@ -79,13 +124,24 @@ export default function ThreeBackground() {
 
     // クリーンアップ
     return () => {
-      mountRef.current?.removeChild(renderer.domElement);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      if (mountRef.current && renderer.domElement) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
       renderer.dispose();
+      geometry.dispose();
+      material.dispose();
       window.removeEventListener("resize", handleResize);
     };
   }, []);
 
   return (
-    <div ref={mountRef} className="absolute w-100%"/>
+    <div
+      ref={mountRef}
+      className="fixed inset-0 w-full h-full -z-10"
+      style={{ pointerEvents: "none" }} // マウスイベントを無視
+    />
   );
 }
