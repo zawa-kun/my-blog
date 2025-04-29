@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 export default function ThreeBackground() {
   const mountRef = useRef<HTMLDivElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -39,7 +38,7 @@ export default function ThreeBackground() {
 
     updateSize();
     mountRef.current.appendChild(renderer.domElement);
-    setIsLoaded(true);
+
 
     // 波の作成
     const geometry = new THREE.PlaneGeometry(10, 10, 100, 100);
