@@ -42,7 +42,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
   const { html, metadata } = await getBlogPostBySlug(slug);
 
   return (
-    <div className="px-4 py-8">
+    <div className="px-4 py-18">
       <BlogArticle
         html={html}
         title={metadata.title}
