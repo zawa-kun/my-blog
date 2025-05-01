@@ -8,12 +8,11 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  // paramsオブジェクト全体をawaitする
+  // params自体を先にawaitする
   const resolvedParams = await params;
-  const slug = resolvedParams.slug;
 
   // メタデータの取得
-  const { metadata } = await getBlogPostBySlug(slug);
+  const { metadata } = await getBlogPostBySlug(resolvedParams.slug);
 
   return {
     title: metadata.title,
@@ -34,15 +33,14 @@ export default async function BlogPostPage({
 }: {
   params: { slug: string };
 }) {
-  // paramsオブジェクト全体をawaitする
+  // params自体を先にawaitする
   const resolvedParams = await params;
-  const slug = resolvedParams.slug;
 
   // 記事データの取得をライブラリ関数に分離
-  const { html, metadata } = await getBlogPostBySlug(slug);
+  const { html, metadata } = await getBlogPostBySlug(resolvedParams.slug);
 
   return (
-    <div className="px-4 py-8">
+    <div className="px-4 py-18">
       <BlogArticle
         html={html}
         title={metadata.title}
