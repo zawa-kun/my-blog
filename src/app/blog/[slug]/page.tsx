@@ -2,17 +2,22 @@ import BlogArticle from "@/features/blog/blogArticle/blogArticle";
 import { getBlogPostBySlug } from "@/lib/blog";
 import { Metadata } from "next";
 
+type Params = {
+  slug: string;
+};
+
 // 動的メタデータ生成関数
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Params;
 }): Promise<Metadata> {
-  // params自体を先にawaitする
-  const resolvedParams = await params;
+  // paramsを先にawaitする
+  const resolvedParams = await Promise.resolve(params);
+  const slug = resolvedParams.slug;
 
   // メタデータの取得
-  const { metadata } = await getBlogPostBySlug(resolvedParams.slug);
+  const { metadata } = await getBlogPostBySlug(slug);
 
   return {
     title: metadata.title,
@@ -28,19 +33,16 @@ export async function generateMetadata({
 }
 
 // ページコンポーネント
-export default async function BlogPostPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  // params自体を先にawaitする
-  const resolvedParams = await params;
+export default async function BlogPostPage({ params }: { params: Params }) {
+  // paramsを先にawaitする
+  const resolvedParams = await Promise.resolve(params);
+  const slug = resolvedParams.slug;
 
-  // 記事データの取得をライブラリ関数に分離
-  const { html, metadata } = await getBlogPostBySlug(resolvedParams.slug);
+  // 記事データの取得
+  const { html, metadata } = await getBlogPostBySlug(slug);
 
   return (
-    <div className="px-4 py-18">
+    <div className="px-4 py-8">
       <BlogArticle
         html={html}
         title={metadata.title}
