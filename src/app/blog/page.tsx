@@ -5,8 +5,8 @@ export default function BlogPage() {
   const posts = getAllPostMeta();
 
   return (
-    <div className="px-30 py-18">
-      <AllBlogCards posts= { posts } />
+    <div className="px-4 sm:px-6 py-18 w-full max-w-6xl mx-auto">
+      <AllBlogCards posts={posts} />
     </div>
   );
 }
