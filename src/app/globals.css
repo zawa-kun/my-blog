@@ -11,3 +11,111 @@ body {
   font-family: 'Inter', sans-serif;
   line-height: 1.6;
 }
+
+/* 既存のTailwind設定の後に追加 */
+
+
+
+/* ブログ記事のスタイル */
+.blog-article {
+  /* 基本スタイル */
+  @apply max-w-none leading-relaxed;
+}
+
+/* 見出しスタイル */
+.blog-article h1 {
+  @apply text-3xl font-extrabold my-6 pb-2;
+}
+
+.blog-article h2 {
+  @apply text-2xl font-bold mt-8 mb-4 pl-3 border-l-4 border-blue-400;
+}
+
+.blog-article h3 {
+  @apply text-xl font-semibold mt-6 mb-3;
+}
+
+/* 段落スタイル */
+.blog-article p {
+  @apply my-4 text-base;
+}
+
+/* 太字スタイル */
+.blog-article strong {
+  @apply font-bold;
+}
+
+/* リストスタイル */
+.blog-article ul {
+  @apply list-disc pl-6 my-4 space-y-2;
+}
+
+.blog-article ol {
+  @apply list-decimal pl-6 my-4 space-y-2;
+}
+
+.blog-article li {
+  @apply my-1;
+}
+
+/* コードブロックスタイル */
+.blog-article pre {
+  @apply bg-gray-900 rounded-lg shadow-lg p-4 my-6 overflow-x-auto border border-gray-700 relative;
+}
+
+.blog-article code {
+  @apply font-mono text-sm;
+}
+
+/* 言語表示ラベル（オプション） */
+.blog-article pre[data-language]::before {
+  content: attr(data-language);
+  @apply absolute top-0 right-4 bg-blue-500/20 text-blue-300 px-2 py-1 text-xs font-bold rounded-b;
+}
+
+/* 画像スタイル */
+.blog-article img {
+  @apply rounded-lg shadow-md max-w-full my-6 mx-auto;
+}
+
+/* 引用スタイル */
+.blog-article blockquote {
+  @apply pl-4 border-l-4 border-blue-300 italic my-4 text-gray-600;
+}
+
+/* テーブルスタイル */
+.blog-article table {
+  @apply w-full border-collapse my-6;
+}
+
+.blog-article th {
+  @apply bg-gray-100 p-2 border border-gray-300 font-bold;
+}
+
+.blog-article td {
+  @apply p-2 border border-gray-300;
+}
+
+/* フォーカス時のスタイル */
+.blog-article a:focus {
+  @apply outline-none ring-2 ring-blue-400 ring-offset-1;
+}
+
+/* リンクスタイル */
+.blog-article a {
+  @apply text-blue-500 font-medium underline underline-offset-2 hover:text-blue-700 transition-colors duration-200;
+}
+
+/* リンクのアンダーラインアニメーション（オプション） */
+.blog-article a {
+  @apply relative inline-block no-underline;
+}
+
+.blog-article a::after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 scale-x-0 origin-bottom-right transition-transform duration-300 ease-out;
+}
+
+.blog-article a:hover::after {
+  @apply scale-x-100 origin-bottom-left;
+}
