@@ -2,9 +2,9 @@ import BlogArticle from "@/features/blog/blogArticle/blogArticle";
 import { getBlogPostBySlug } from "@/lib/blog";
 import { Metadata } from "next";
 
-type Params = {
+type Params = Promise<{
   slug: string;
-};
+}>;
 
 // 動的メタデータ生成関数
 export async function generateMetadata({
