@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 :root {
   --foreground: #ffffff;
   --background: #000000;
@@ -11,10 +12,6 @@ body {
   font-family: 'Inter', sans-serif;
   line-height: 1.6;
 }
-
-/* 既存のTailwind設定の後に追加 */
-
-
 
 /* ブログ記事のスタイル */
 .blog-article {
@@ -50,6 +47,13 @@ body {
   @apply list-disc pl-6 my-4 space-y-2;
 }
 
+/*段落付きリスト2階層目以降のスタイル*/
+.blog-article ul ul {
+  @apply list-[circle] pl-6 my-4 space-y-2;
+}
+
+
+/* 順序付きリストスタイル */
 .blog-article ol {
   @apply list-decimal pl-6 my-4 space-y-2;
 }
