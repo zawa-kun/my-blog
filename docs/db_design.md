@@ -1,16 +1,30 @@
 # DB設計
-## エンティティ抽出
+## エンティティ抽出（制約）
 - 記事：自分が書く記事
-  - タグ
-- 本（情報源）
-  - タグ
+  - `slug`：主キー。
+  - `title`：NOT NULL
+  - `content_md`：生のマークダウン
+  - `created_at`：記事作成日,NOT NULL
+  - `updated_at`：記事更新日（更新があった日で随時更新）,NOT NULL
+  - `visibility`：**public** / **private**。NOT NULL, デフォルトはNOT NULL
+  - `content_hash`：NOT NULL
+- 情報源（Resource）
+  - `id`：主キー
+  - `title`：NOT NULL
+  - `type`：NOT NULL(book/Udemy/thesis/pdf等)
+  - `creator`：NOT NULL
+  - `status`：DB側では文字列で管理し、アプリケーションコード側で定数管理。
+  - `link_url`：情報源のリンク、UNIEQUE
+- タグ
+  - `name`：主キー
 
 ## ER図
-![alt text](imgs/my-blog.drawio.png)
+![alt text](imgs/db_design_1.jpg)
 **【考慮点】**
 - `Post`テーブル
+  - `slug`を主キーにした理由は、今後Github上で記事を管理しようと考えており、投稿済みか否かをGithub上のmdのメタデータに含むことで、管理しやすくなるからである。
   - `text_md`は、いずれ単語等でブログ内検索を書けることができるようにするため、ファイルパスでなく、生のmdで実装。
-  - 代理キー`id`に関して、`slug`又は、`title_eng`+`created_at`の複合主キーも候補としては上がるが、投稿後のタイトル変更等を考え、`id`で運用する。
+  - `content_hash`について、記事内容を全件検索はパフォーマンス的にダサいので、このハッシュ値で管理する。
 - `Tag`テーブルの共有
   - 「タグ」を「ブログ記事」と「参照文献」で共有している点については、個人のブログの為、タグ数はそこまで増えないこと、そして、分離した際に少々設計が複雑になる為、一旦共有する形とする。(フィルタリングは`Post_tag`と`Resourse_tag`テーブルにするか否かで実装できる。)
 - `Post_resource`テーブル
