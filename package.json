@@ -18,14 +18,14 @@
     "framer-motion": "^12.9.2",
     "gray-matter": "^4.0.3",
     "highlight.js": "^11.11.1",
+    "marked": "^17.0.1",
     "next": "15.3.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "remark": "^15.0.1",
-    "remark-html": "^16.0.1",
     "three": "^0.176.0"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.16",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/jest": "^29.5.14",
