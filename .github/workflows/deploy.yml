@@ -42,6 +42,6 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           # D1へのマイグレーション(テーブル作成)を実行
-          npx wrangler d1 execute my-blog-db --file=./d1/schema.sql --yes
+          npx wrangler d1 execute my-blog-db --file=./src/db/schema.sql --yes
           # 記事データを同期
           npm run db:sync:remote
