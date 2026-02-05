@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "preview": "npm run pages:build && npx wrangler pages dev .vercel/output/static",
     "pages:build": "npx @cloudflare/next-on-pages",
     "db:sync:local": "tsx scripts/sync-db.ts --local",
     "db:sync:remote": "tsx scripts/sync-db.ts"
