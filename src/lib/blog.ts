@@ -1,6 +1,5 @@
 import { getPostBySlug, markdownToHtml } from "./db";
 
-// D1から記事を取得してHTMLに変換
 export async function getBlogPostBySlug(slug: string) {
   const post = await getPostBySlug(slug);
 
