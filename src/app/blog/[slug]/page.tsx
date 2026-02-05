@@ -2,6 +2,8 @@ import BlogArticle from "@/features/blog/blogArticle/blogArticle";
 import { getBlogPostBySlug } from "@/lib/blog";
 import { Metadata } from "next";
 
+export const runtime = "edge";
+
 type Params = Promise<{
   slug: string;
 }>;
