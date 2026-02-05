@@ -41,7 +41,7 @@ export default async function BlogPage() {
 
                   {/* タグ */}
                   {post.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 py-1">
                       {post.tags.map((tag) => (
                         <span
                           key={tag}
