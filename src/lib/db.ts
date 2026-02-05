@@ -71,7 +71,7 @@ export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
     .bind(slug)
     .all<{ tag_name: string }>();
 
-  const tags = tagResults.map((t) => t.tag_name);
+  const tags = tagResults.map((t: { tag_name: string }) => t.tag_name);
 
   return {
     ...post,
