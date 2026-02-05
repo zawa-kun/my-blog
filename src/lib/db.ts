@@ -104,3 +104,62 @@ export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
 export async function markdownToHtml(markdown: string): Promise<string> {
   return await marked.parse(markdown);
 }
+
+// lib/db.ts に追加する型定義と関数
+
+export interface PostWithTags extends Post {
+  tags: string[];
+}
+
+export async function getPostsWithTagsFromDB(): Promise<PostWithTags[]> {
+  try {
+    const { env } = getRequestContext();
+
+    if (!env || !env.DB) {
+      throw new Error("DB binding not found");
+    }
+
+    // 記事一覧を取得
+    const { results: posts } = await env.DB.prepare(
+      "SELECT slug, title, created_at, updated_at, visibility FROM posts WHERE visibility = 'public' ORDER BY created_at DESC",
+    ).all<Post>();
+
+    // 各記事のタグを取得
+    const postsWithTags = await Promise.all(
+      posts.map(async (post) => {
+        const { results: tagResults } = await env.DB.prepare(
+          `SELECT tag_name FROM post_tags WHERE post_slug = ?`,
+        )
+          .bind(post.slug)
+          .all<{ tag_name: string }>();
+
+        const tags = tagResults.map((t: { tag_name: string }) => t.tag_name);
+
+        return {
+          ...post,
+          tags,
+        };
+      }),
+    );
+
+    return postsWithTags;
+  } catch (e) {
+    console.log("⚠️ Running in dev mode. Using Mock Data with Tags.");
+    return [
+      {
+        slug: "dev-test",
+        title: "【開発用】テスト記事タイトル",
+        created_at: new Date().toISOString(),
+        visibility: "public",
+        tags: ["開発", "テスト"],
+      },
+      {
+        slug: "dev-design-check",
+        title: "デザイン確認用のモック記事",
+        created_at: new Date().toISOString(),
+        visibility: "public",
+        tags: ["デザイン", "UI"],
+      },
+    ];
+  }
+}
