@@ -8,6 +8,7 @@
   - `updated_at`：記事更新日（更新があった日で随時更新）,NOT NULL
   - `visibility`：**public** / **private**。NOT NULL, デフォルトはNOT NULL
   - `content_hash`：NOT NULL
+  - `img_link_url`
 - 情報源（Resource）
   - `id`：主キー
   - `title`：NOT NULL
