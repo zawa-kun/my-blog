@@ -126,7 +126,7 @@ export async function getPostsWithTagsFromDB(): Promise<PostWithTags[]> {
 
     // 各記事のタグを取得
     const postsWithTags = await Promise.all(
-      posts.map(async (post) => {
+      posts.map(async (post: Post) => {
         const { results: tagResults } = await env.DB.prepare(
           `SELECT tag_name FROM post_tags WHERE post_slug = ?`,
         )
