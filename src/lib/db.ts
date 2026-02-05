@@ -34,6 +34,7 @@ export async function getPostsFromDB(): Promise<Post[]> {
 
     return results;
   } catch (e) {
+    console.error("DB Error:", e);
     console.log("⚠️ Running in dev mode. Using Mock Data.");
     return [
       {
@@ -87,6 +88,7 @@ export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
       tags,
     };
   } catch (e) {
+    console.error("DB Error:", e);
     console.log("⚠️ Using Mock Data for Detail Page.");
     return {
       slug: slug,
@@ -144,6 +146,7 @@ export async function getPostsWithTagsFromDB(): Promise<PostWithTags[]> {
 
     return postsWithTags;
   } catch (e) {
+    console.error("DB Error:", e);
     console.log("⚠️ Running in dev mode. Using Mock Data with Tags.");
     return [
       {
