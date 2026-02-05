@@ -30,7 +30,7 @@ function executeSql(sql: string) {
   const tmpFile = path.join(process.cwd(), '.tmp-query.sql');
   fs.writeFileSync(tmpFile, sql, 'utf-8');
   
-  const command = `npx wrangler d1 execute ${DB_NAME} ${IS_LOCAL ? '--local' : '--remote'} --file "${tmpFile}"`;
+  const command = `npx wrangler d1 execute ${DB_NAME} ${IS_LOCAL ? '--local' : '--remote'} --file "${tmpFile}" --yes`;
   
   try {
     const result = execSync(command, { encoding: 'utf-8', stdio: 'pipe' });
