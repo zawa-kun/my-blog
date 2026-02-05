@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Cloudflare Wrangler
+# ローカルDBのデータファイルやログが含まれている
+.wrangler/
+# Cloudflare Pagesにおける.envみたいなもの。APIキーなどの秘密情報はこちらに入れる為。
+.dev.vars
