@@ -1,7 +1,9 @@
 ---
-title: "自己紹介"
-date: "2025-05-01"
-tags: ["自己紹介"]
+title: "ブログを開設しました"
+created_at: "2025-05-01"
+updated_at: "2025-05-01"
+tags: ["Life"]
+visibility: "public"
 ---
 
 初めまして！ **zawa-kun** です！
