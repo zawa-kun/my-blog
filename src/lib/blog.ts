@@ -1,25 +1,23 @@
-import fs from "fs/promises";
-import path from "path";
-import matter from "gray-matter";
+import { getPostBySlug, markdownToHtml } from "./db";
 
-// 特定のスラッグのブログ記事を取得する関数
+// D1から記事を取得してHTMLに変換
 export async function getBlogPostBySlug(slug: string) {
-  // HTMLファイルの取得
-  const filePath = path.join(process.cwd(), "public/posts", `${slug}.html`);
-  const html = await fs.readFile(filePath, "utf-8");
+  const post = await getPostBySlug(slug);
 
-  // メタデータの取得（Markdownファイルからfrontmatter情報を取得）
-  const mdPath = path.join(process.cwd(), "src/content/blog", `${slug}.md`);
-  const mdContent = await fs.readFile(mdPath, "utf-8");
-  const { data } = matter(mdContent);
+  if (!post) {
+    throw new Error(`Post not found: ${slug}`);
+  }
+
+  // MarkdownをHTMLに変換
+  const html = await markdownToHtml(post.content_md);
 
   return {
     html,
     metadata: {
-      title: data.title,
-      date: data.date,
-      tags: data.tags,
-      slug: slug,
+      title: post.title,
+      date: post.created_at,
+      tags: post.tags,
+      slug: post.slug,
     },
   };
 }
