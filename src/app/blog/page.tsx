@@ -1,34 +1,71 @@
-// src/app/page.tsx
+// src/app/blog/page.tsx
 import Link from "next/link";
-import { getPostsFromDB } from "@/lib/db"; // さっき作った関数
+import { getPostsWithTagsFromDB } from "@/lib/db";
 
-// Cloudflare Pages (Edge) で動かすための設定
 export const runtime = "edge";
 
-export default async function Home() {
-  // DBから記事一覧を取得
-  const posts = await getPostsFromDB();
+export default async function BlogPage() {
+  const posts = await getPostsWithTagsFromDB();
+  console.log(posts);
 
   return (
-    <main className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">My Blog (Powered by D1)</h1>
+    <main className="max-w-4xl mx-auto px-4 py-25">
+      {/* ヘッダーセクション */}
+      <div className="mb-12">
+        <h1 className="text-4xl font-bold tracking-tight mb-3">Blog</h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          技術記事や学んだことを書いています
+        </p>
+      </div>
 
+      {/* 記事一覧 */}
       {posts.length === 0 ? (
-        <p>記事が見つかりません（またはDB接続エラー）</p>
+        <div className="text-center py-12">
+          <p className="text-gray-500 dark:text-gray-400">
+            記事が見つかりません
+          </p>
+        </div>
       ) : (
-        <ul className="space-y-4">
+        <div className="space-y-8">
           {posts.map((post) => (
-            <li
+            <article
               key={post.slug}
-              className="border p-4 rounded shadow-sm hover:shadow-md transition"
+              className="group border-b border-gray-200 dark:border-gray-800 pb-8 last:border-b-0"
             >
               <Link href={`/blog/${post.slug}`} className="block">
-                <h2 className="text-xl font-semibold">{post.title}</h2>
-                <time className="text-gray-500 text-sm">{post.created_at}</time>
+                <div className="space-y-2">
+                  {/* タイトル */}
+                  <h2 className="text-2xl font-semibold tracking-tight group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors">
+                    {post.title}
+                  </h2>
+
+                  {/* タグ */}
+                  {post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 py-1">
+                      {post.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="inline-block bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs px-2 py-1 rounded"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* 日付 */}
+                  <time className="block text-sm text-gray-500 dark:text-gray-400">
+                    {new Date(post.created_at).toLocaleDateString("ja-JP", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </time>
+                </div>
               </Link>
-            </li>
+            </article>
           ))}
-        </ul>
+        </div>
       )}
     </main>
   );
