@@ -1,11 +1,11 @@
 // src/app/blog/page.tsx
 import Link from "next/link";
-import { getPostsWithTagsFromDB } from "@/lib/db";
+import { getAllPostsWithTagsFromDB } from "@/lib/db";
 
 export const runtime = "edge";
 
 export default async function BlogPage() {
-  const posts = await getPostsWithTagsFromDB();
+  const posts = await getAllPostsWithTagsFromDB();
   console.log(posts);
 
   return (
