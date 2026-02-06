@@ -10,7 +10,6 @@ const links = [
   { name: "Home", href: "/"},
   { name: "About", href: "/about" },
   { name: "Blog", href: "/blog" },
-  { name: "Skill", href: "/skill" },
 ];
 
 export default function HamburgerMenu() {

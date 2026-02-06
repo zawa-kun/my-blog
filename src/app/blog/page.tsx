@@ -9,9 +9,9 @@ export default async function BlogPage() {
   console.log(posts);
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-25">
+    <main className="max-w-4xl mx-auto px-4 py-20">
       {/* ヘッダーセクション */}
-      <div className="mb-12">
+      <div className="mb-8">
         <h1 className="text-4xl font-bold tracking-tight mb-3">Blog</h1>
         <p className="text-gray-600 dark:text-gray-400">
           技術記事や学んだことを書いています
