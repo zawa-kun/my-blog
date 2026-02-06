@@ -28,18 +28,21 @@ console.log(
 // Helper: Wrangler経由でSQLを実行する関数
 // =================================
 function executeSql(sql: string) {
-  // 一時ファイルにSQLを書き出す
   const tmpFile = path.join(process.cwd(), ".tmp-query.sql");
   fs.writeFileSync(tmpFile, sql, "utf-8");
 
-  const command = `npx wrangler d1 execute ${DB_NAME} ${IS_LOCAL ? "--local" : "--remote"} --file "${tmpFile}" --yes`;
+  const command = `npx wrangler d1 execute ${DB_NAME} ${IS_LOCAL ? "--local" : "--remote"} --file="${tmpFile}" --yes`;
 
   try {
     const result = execSync(command, { encoding: "utf-8", stdio: "pipe" });
-    fs.unlinkSync(tmpFile); // 実行後に削除
+    if (fs.existsSync(tmpFile)) {
+      fs.unlinkSync(tmpFile);
+    }
     return result;
   } catch (error) {
-    fs.unlinkSync(tmpFile); // エラー時も削除
+    if (fs.existsSync(tmpFile)) {
+      fs.unlinkSync(tmpFile);
+    }
     console.error("❌ SQL Execution Error:", error);
     throw error;
   }
