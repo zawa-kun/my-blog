@@ -1,86 +1,44 @@
+// DB操作関連
 import { getRequestContext } from "@cloudflare/next-on-pages";
-import { marked } from "marked";
+import { Post, PostDetail } from "@/types/type";
+import { getMockPostDetail, getMockAllPosts } from "./mocks";
 
-export interface Post {
-  slug: string;
-  title: string;
-  created_at: string;
-  updated_at?: string;
-  visibility?: string;
-}
-
-export interface PostDetail {
-  slug: string;
-  title: string;
-  content_md: string;
-  created_at: string;
-  updated_at?: string;
-  visibility?: string;
-  content_hash: string;
-  tags: string[];
-}
-
-export async function getPostsFromDB(): Promise<Post[]> {
-  try {
-    const { env } = getRequestContext();
-
-    if (!env || !env.DB) {
-      throw new Error("DB binding not found");
-    }
-
-    const { results } = await env.DB.prepare(
-      "SELECT slug, title, created_at, updated_at, visibility FROM posts WHERE visibility = 'public' ORDER BY created_at DESC",
-    ).all<Post>();
-
-    return results;
-  } catch (e) {
-    console.error("DB Error:", e);
-    console.log("⚠️ Running in dev mode. Using Mock Data.");
-    return [
-      {
-        slug: "dev-test",
-        title: "【開発用】テスト記事タイトル",
-        created_at: new Date().toISOString(),
-        visibility: "public",
-      },
-      {
-        slug: "dev-design-check",
-        title: "デザイン確認用のモック記事",
-        created_at: new Date().toISOString(),
-        visibility: "public",
-      },
-    ];
-  }
-}
-
+// =====================================================================
+// スラッグからタグ付き個別の記事データ（内容含め）を取得する関数
+// 引数: slug - 記事のスラッグ
+// 戻り値: PostDetail型（内容のmdファイル含む）のオブジェクトまたはnull（記事が見つからなかった場合）
+// =====================================================================
 export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
   try {
+    // Cloudflare Workersのリクエストコンテキストを取得
     const { env } = getRequestContext();
 
-    if (!env || !env.DB) {
-      throw new Error("DB binding not found");
-    }
-
-    // 記事本体を取得
+    // ---------------------------------------------------------------
+    // DBから記事に関する情報を取得
+    // ---------------------------------------------------------------
+    // postsテーブルから記事の基本情報（content_mdを含む）を取得
     const post = await env.DB.prepare(
-      `SELECT slug, title, content_md, created_at, updated_at, visibility, content_hash
+      `SELECT slug, title, content_md, created_at, updated_at, visibility,content_hash
        FROM posts 
        WHERE slug = ? AND visibility = 'public'`,
     )
-      .bind(slug)
-      .first<Omit<PostDetail, "tags">>();
+      .bind(slug) // SQLインジェクション対策で"?"部分にslugを置き換える。プレースホルダを使用。
+      .first<Omit<PostDetail, "tags">>(); // tagsを除く投稿の基本情報を取得
 
+    // 記事が見つからなかった場合はnullを返す
     if (!post) {
       return null;
     }
 
-    // タグを取得
+    // post_tagsテーブルから記事のタグを取得
+    // {tag_name: string}[]型のresultsを取得
     const { results: tagResults } = await env.DB.prepare(
       `SELECT tag_name FROM post_tags WHERE post_slug = ?`,
     )
-      .bind(slug)
+      .bind(slug) // "?"部分にslugを置き換える。
       .all<{ tag_name: string }>();
 
+    // tag_name[]型に変換
     const tags = tagResults.map((t: { tag_name: string }) => t.tag_name);
 
     return {
@@ -88,53 +46,41 @@ export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
       tags,
     };
   } catch (e) {
+    // getRequestContext()呼び出しエラーまたはDB接続エラー
     console.error("DB Error:", e);
-    console.log("⚠️ Using Mock Data for Detail Page.");
-    return {
-      slug: slug,
-      title: "【開発用】詳細ページのテスト",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      visibility: "public",
-      content_md: `# テスト記事\n\nこれは**ローカル開発用**のモックデータです。\n\n- リスト1\n- リスト2\n\n## サブ見出し\n\n段落のテキスト。# テスト記事\n\nこれは**ローカル開発用**のモックデータです。\n\n- リスト1\n- リスト2\n\n## サブ見出し\n\n段落のテキスト。# テスト記事\n\nこれは**ローカル開発用**のモックデータです。\n\n- リスト1\n- リスト2\n\n## サブ見出し\n\n段落のテキスト。# テスト記事\n\nこれは**ローカル開発用**のモックデータです。\n\n- リスト1\n- リスト2\n\n## サブ見出し\n\n段落のテキスト。`,
-      content_hash: "dev-mock-hash",
-      tags: ["開発", "テスト"],
-    };
+    console.log("⚠️ 開発環境または接続エラー。モックデータを返します。");
+    return getMockPostDetail();
   }
 }
 
-export async function markdownToHtml(markdown: string): Promise<string> {
-  return await marked.parse(markdown);
-}
-
-// lib/db.ts に追加する型定義と関数
-
-export interface PostWithTags extends Post {
-  tags: string[];
-}
-
-export async function getPostsWithTagsFromDB(): Promise<PostWithTags[]> {
+// =====================================================================
+// 投稿の基本情報を全て取得する関数
+// 引数: なし
+// 戻り値: Post型の配列
+// =====================================================================
+export async function getAllPostsWithTagsFromDB(): Promise<Post[]> {
   try {
+    // Cloudflare Workersのリクエストコンテキストを取得
     const { env } = getRequestContext();
 
-    if (!env || !env.DB) {
-      throw new Error("DB binding not found");
-    }
-
-    // 記事一覧を取得
+    // ----------------------------------------------------
+    // 記事の基本情報を取得
+    // ----------------------------------------------------
     const { results: posts } = await env.DB.prepare(
       "SELECT slug, title, created_at, updated_at, visibility FROM posts WHERE visibility = 'public' ORDER BY created_at DESC",
     ).all<Post>();
 
     // 各記事のタグを取得
+    // Promise.allで非同期処理を並列実行
     const postsWithTags = await Promise.all(
       posts.map(async (post: Post) => {
         const { results: tagResults } = await env.DB.prepare(
           `SELECT tag_name FROM post_tags WHERE post_slug = ?`,
         )
-          .bind(post.slug)
-          .all<{ tag_name: string }>();
+          .bind(post.slug) // "?"部分にslugを置き換える。
+          .all<{ tag_name: string }>(); // {tag_name: string}[]型のresultsを取得
 
+        // tag_name[]型に変換
         const tags = tagResults.map((t: { tag_name: string }) => t.tag_name);
 
         return {
@@ -147,22 +93,7 @@ export async function getPostsWithTagsFromDB(): Promise<PostWithTags[]> {
     return postsWithTags;
   } catch (e) {
     console.error("DB Error:", e);
-    console.log("⚠️ Running in dev mode. Using Mock Data with Tags.");
-    return [
-      {
-        slug: "dev-test",
-        title: "【開発用】テスト記事タイトル",
-        created_at: new Date().toISOString(),
-        visibility: "public",
-        tags: ["開発", "テスト"],
-      },
-      {
-        slug: "dev-design-check",
-        title: "デザイン確認用のモック記事",
-        created_at: new Date().toISOString(),
-        visibility: "public",
-        tags: ["デザイン", "UI"],
-      },
-    ];
+    console.log("⚠️ エラーが発生しました。モックデータを返します。");
+    return getMockAllPosts();
   }
 }
