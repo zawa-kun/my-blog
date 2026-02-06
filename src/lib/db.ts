@@ -1,7 +1,7 @@
 // DB操作関連
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { Post, PostDetail } from "@/types/type";
-import { getMockPostDetail, getMockAllPosts } from "./mocks";
+import { getMockPostDetail, getMockAllPosts } from "./mock";
 
 // =====================================================================
 // スラッグからタグ付き個別の記事データ（内容含め）を取得する関数
