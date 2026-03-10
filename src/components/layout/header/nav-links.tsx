@@ -9,7 +9,7 @@ const links = [
     { name: 'Home', href: '/'},
     { name: 'About', href: '/about'},
     { name: 'Blog', href: '/blog'},
-    
+    { name: 'Book', href: '/book'},
 ];
 
 export default function NavLinks() {
