@@ -15,7 +15,18 @@ export default function HeadlineList({ headings }: HeadlineListProps) {
                 style={{ paddingLeft: `${(heading.level - 1) * 0.75}rem` }}
                 className="hover:text-blue-600"
               >
-                <a href={`#${heading.id}`}>{heading.text}</a>
+                <a
+                  href={`#${heading.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById(heading.id)?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }}
+                >
+                  {heading.text}
+                </a>
               </li>
             ))}
           </ul>

@@ -16,8 +16,16 @@ export async function getBlogPostBySlug(slug: string) {
     throw new Error(`Post not found: ${slug}`);
   }
 
-  // MarkdownをHTMLに変換
-  const html = await marked.parse(post.content_md);
+  // カスタムレンダラーで見出しにIDを自動付与
+  let headingIndex = 0;
+  const renderer = new marked.Renderer();
+  renderer.heading = ({ text, depth }: { text: string; depth: number }) => {
+    const id = `heading-${headingIndex++}`;
+    return `<h${depth} id="${id}">${text}</h${depth}>`;
+  };
+
+  // MarkdownをHTMLに変換（カスタムレンダラー使用）
+  const html = await marked.parse(post.content_md, { renderer });
 
   return {
     html,
