@@ -26,23 +26,21 @@ export default function Article({ html, onHeadingsExtracted }: ArticleProps) {
       const headingElements = articleRef.current.querySelectorAll(
         "h1, h2, h3, h4, h5, h6"
       );
-      const extractedHeadings = Array.from(headingElements).map((heading) => {
-        const id =
-          heading.id ||
-          heading.textContent?.trim().toLowerCase().replace(/\s+/g, "-") ||
-          "";
+      const extractedHeadings = Array.from(headingElements).map(
+        (heading, index) => {
+          // インデックスベースのIDを生成（日本語テキストや重複を回避）
+          const id = `heading-${index}`;
 
-        // IDがなければ追加
-        if (!heading.id) {
+          // 常にIDを上書きして一貫性を保つ
           heading.id = id;
-        }
 
-        return {
-          id,
-          text: heading.textContent || "",
-          level: parseInt(heading.tagName.substring(1)),
-        };
-      });
+          return {
+            id,
+            text: heading.textContent || "",
+            level: parseInt(heading.tagName.substring(1)),
+          };
+        }
+      );
 
       // 抽出した見出し情報を親コンポーネントに渡す
       onHeadingsExtracted(extractedHeadings);
